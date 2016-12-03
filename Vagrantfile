@@ -34,6 +34,6 @@ Vagrant.configure("2") do |config|
     ansible.inventory_path = 'provision/inventory'
   end
     
-  #config.vm.provision :reload
+  config.vm.provision :reload
   
 end
