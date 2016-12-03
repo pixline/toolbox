@@ -8,12 +8,6 @@ Vagrant.configure("2") do |config|
   config.vm.box = "freebsd/FreeBSD-11.0-STABLE"
   config.ssh.shell = "sh"
   config.vm.base_mac = "080027D14C66"
-  # See https://github.com/mitchellh/vagrant/issues/5005
-  # config.ssh.insert_key = false
-  # config.ssh.private_key_path = File.expand_path('~/.vagrant.d/insecure_private_key')
-  # config.ssh.username = 'root'
-  # config.ssh.password = 'vagrant'
-  # config.ssh.forward_agent = true
 
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--memory", "2048"]
@@ -33,7 +27,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "system", type: "shell", path: File.join( "provision", "pre-setup.sh" )
   
   config.vm.provision "ansible" do |ansible|
-    ansible.verbose = "v"
+    ansible.verbose = "vv"
     ansible.playbook = "provision/system.yml"
     #ansible.ask_vault_pass = true
     ansible.host_key_checking = false
