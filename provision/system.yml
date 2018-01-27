@@ -1,6 +1,5 @@
 - name: System LEMP setup
   hosts: default
-  become: true
-  become_user: root
   roles:
     - roles/freebsd-emp
+    - roles/tools

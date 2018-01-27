@@ -1,0 +1,88 @@
+- name: Install tools/utilities from packages
+  become: true
+  pkgng:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - bind-tools
+    - bingrep
+    - grepcidr
+    - jq
+    - lnav
+    - metasploit
+    - ngrep
+    - nikto
+    - ripgrep
+    - screen
+    - sgrep2
+    - sqlmap
+    - tmux
+    - vim
+    - whatweb
+
+- name: Configure composer
+  composer:
+    command: config
+    global_command: yes
+    arguments: minimum-stability "dev"
+    
+- name: Install tools via composer
+  composer:
+    command: require
+    global_command: yes
+    arguments: "{{ item }}"
+  with_items:
+    - designsecurity/progpilot
+
+- name: Install tools (and dependencies) via python-pip (2.7)
+  become: true
+  pip:
+    name: "{{ item }}"
+    executable: pip-2.7
+  with_items:
+    - clearbit
+    - droopescan
+    - fullcontact.py
+    - pythonwhois
+    - requests
+    - shodan
+    - sslscan
+    - steganography
+    - webscreenshot
+
+- name: Install tools via python-pip (3.6)
+  become: true
+  pip:
+    name: "{{ item }}"
+    executable: pip-3.6
+  with_items:
+    - mitmproxy
+
+- name: Install tools via go
+  shell: "go get {{ item }}"
+  with_items:
+    - github.com/asciimoo/wuzz
+
+- name: Install tools (and dependencies) via rubygems
+  gem:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - aquatone
+    - json
+    - wpscan
+
+- name: Install wp-cli packages
+  shell: "wp package install {{ item }}"
+  with_items:
+    - 10up/mu-migration
+    - aaemnnosttv/wp-cli-http-command
+    - aaemnnosttv/wp-cli-login-command
+    - binarygary/db-checkpoint
+    - danielbachhuber/wp-cli-stat-command
+    - eriktorsner/wp-checksum
+    - iandunn/wp-cli-plugin-active-on-sites
+    - iandunn/wp-cli-rename-db-prefix
+    - markri/wp-sec
+    - pantheon-systems/wp_launch_check
+    - petenelson/wp-cli-size

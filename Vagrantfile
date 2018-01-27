@@ -5,7 +5,7 @@ vagrant_dir = File.expand_path(File.dirname(__FILE__))
 Vagrant.configure("2") do |config|
   config.vm.guest = :freebsd
 
-  config.vm.box = "freebsd/FreeBSD-11.0-STABLE"
+  config.vm.box = "freebsd/FreeBSD-11.1-STABLE"
   config.ssh.shell = "sh"
   config.vm.base_mac = "080027D14C66"
 
@@ -21,19 +21,17 @@ Vagrant.configure("2") do |config|
     vb.name = File.basename(vvv_pwd)
   end
   
-  config.vm.network :private_network, id: "vvv_primary", ip: "192.168.91.91"
-  config.vm.synced_folder ".", "/vagrant", :nfs => true, id: "vagrant-root"
+  config.vm.network :private_network, id: "vvv_primary", ip: "192.168.234.234"
+  config.vm.synced_folder ".", "/vagrant", :nfs => true, id: "vagrant-root", disabled: true
 
   config.vm.provision "system", type: "shell", path: File.join( "provision", "pre-setup.sh" )
   
   config.vm.provision "ansible" do |ansible|
-    ansible.verbose = "vv"
+    ansible.compatibility_mode = "2.0"
     ansible.playbook = "provision/system.yml"
-    #ansible.ask_vault_pass = true
     ansible.host_key_checking = false
     ansible.inventory_path = 'provision/inventory'
+    #ansible.verbose = "vvv"
   end
     
-  config.vm.provision :reload
-  
 end

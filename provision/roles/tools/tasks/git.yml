@@ -1,0 +1,28 @@
+
+- name: Install tools via simple git clone
+  git:
+    repo: "https://github.com/{{ item.repo }}.git"
+    dest: "{{ tools_path }}/{{ item.alias }}"
+  with_items:
+    - { repo: 'aboul3la/Sublist3r', alias: 'sublist3r' }
+    - { repo: 'eldraco/domain_analyzer', alias: 'domain_analyzer' }
+    - { repo: 'espreto/wpsploit', alias: 'wpsploit' }
+    - { repo: 'offensive-security/exploit-database', alias: 'exploit-database' }
+
+- name: Link searchsploit
+  become: true
+  file:
+    src: "{{ tools_path }}/exploit-database/searchsploit"
+    dest: /usr/local/bin/searchsploit
+    state: link
+
+- name: Config searchsploit
+  shell: sed 's|path_array+=(.*)|path_array+=("{{ tools_path }}/exploit-database")|g' {{ tools_path }}/exploit-database/.searchsploit_rc > /home/vagrant/.searchsploit_rc
+
+- name: Get Manalyze source
+  git:
+    repo: https://github.com/JusticeRage/Manalyze.git
+    dest: "{{ tools_path }}/Manalyze"
+
+- name: Build Manalyze
+  shell: "cd {{ tools_path }}/Manalyze && cmake . && make"

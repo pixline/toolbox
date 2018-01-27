@@ -1,75 +1,82 @@
 - name: /etc/fstab entry for bash
+  become: true
   lineinfile:
     dest: /etc/fstab
     line: 'fdesc	/dev/fd		fdescfs		rw	0	0'
 
 - name: Install system/dev Packages
-  pkgng: name={{ item }} state=present
+  become: true
+  pkgng:
+    cached: no
+    name: "{{ item }}"
+    state: present
   with_items:
+    - boost-libs
+    - cmake
     - colordiff
     - curl
+    - fusefs-curlftpfs
+    - fusefs-sshfs
     - gettext
     - git
+    - go
+    - go-tools
     - gmake
     - graphviz
-    - ImageMagick7-nox11
-    - ngrep
+    - lftp
     - node
     - npm
     - libiconv
+    - libressl
+    - phantomjs
+    - py27-pip
+    - py27-virtualenv
+    - py36-pip
+    - py36-virtualenv
+    - ruby24-gems
     - sqlite3
     - subversion
     - sudo
-    - vim
+    - unar
+    - wget
+    - zsh
 
 - name: Install LEMP Packages
-  pkgng: name={{ item }} state=present
+  become: true
+  pkgng:
+    name: "{{ item }}"
+    state: present
   with_items:
-    - mariadb101-client
-    - mariadb101-server
+    - percona57-client
+    - percona57-server
+    - percona-toolkit
     - nginx
-    - php70
-    - php70-bcmath 
-    - php70-bz2 
-    - php70-calendar 
-    - php70-ctype
-    - php70-exif 
-    - php70-fileinfo 
-    - php70-filter 
-    - php70-ftp 
-    - php70-gd 
-    - php70-gettext 
-    - php70-hash
-    - php70-iconv 
-    - php70-imap
-    - php70-intl
-    - php70-json
-    - php70-mbstring
-    - php70-mcrypt
-    - php70-mysqli
-    - php70-opcache
-    - php70-openssl
-    - php70-pcntl
-    - php70-pdo
-    - php70-pdo_sqlite
-    - php70-posix
-    - php70-phar
-    - php70-readline
-    - php70-redis
-    - php70-session
-    - php70-simplexml
-    - php70-sockets
-    - php70-sqlite3
-    - php70-tokenizer
-    - php70-xml
-    - php70-xmlrpc
-    - php70-xmlreader
-    - php70-xmlwriter
-    - php70-xsl
-    - php70-zip
-    - php70-zlib
+    - php72
+    - php72-bz2 
+    - php72-curl
+    - php72-exif 
+    - php72-extensions
+    - php72-fileinfo 
+    - php72-ftp 
+    - php72-gd 
+    - php72-gettext 
+    - php72-imap
+    - php72-intl
+    - php72-mbstring
+    - php72-mysqli
+    - php72-openssl
+    - php72-pcntl
+    - php72-readline
+    - php72-session
+    - php72-sockets
+    - php72-sodium
+    - php72-xmlrpc
+    - php72-xsl
+    - php72-zip
+    - php72-zlib
 
 - name: Install PHP Composer
+  become: true
   get_url: 
     url: https://getcomposer.org/download/1.2.3/composer.phar
     dest: /usr/local/bin/composer
@@ -77,42 +84,49 @@
     checksum: sha256:3378c1422bffa09c29714aefd3240b963ce7731e71ae8894d9c7991101325cb8
 
 - name: Install WP-CLI
+  become: true
   get_url:
-    url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    url: https://github.com/wp-cli/wp-cli/releases/download/v1.4.1/wp-cli-1.4.1.phar
     dest: /usr/local/bin/wp
     mode: 0755
-    checksum: sha256:974997f6dc49750598aad8f519c29b33880032a73ada7a9bcc2a299bbe034819
+    checksum: sha512:f861b5499e0b555a791ab6d76a0f3b1f033ae22aaee63dcdfaf8a0bd44886876690d40c6c95366d60f32d55f6282273e55f8ecdfa8787aec7b435cffe45790e7
 
 - name: Ensures Nginx custom-sites dir exists
+  become: true
   file:
     path: /usr/local/etc/nginx/custom-sites/
     state: directory
     mode: 0755
 
 - name: Ensures Nginx SSL dir exists
+  become: true
   file:
     path: /usr/local/etc/nginx/ssl/
     state: directory
     mode: 0755
 
 - name: Ensures Nginx docroot dir exists
+  become: true
   file:
     path: /srv/www/
     state: directory
     mode: 0755
 
 - name: Ensures Nginx default vhost dir exists
+  become: true
   file:
     path: /srv/www/default/
     state: directory
     mode: 0755
 
 - name: create Nginx self-signed SSL cert
+  become: true
   command: openssl req -new -nodes -x509 -subj "/C=EU/ST=Somewhere/L=Desk/O=EU/CN=zzz.dev" -days 3650 -keyout /usr/local/etc/nginx/ssl/server.key -out /usr/local/etc/nginx/ssl/server.crt -extensions v3_ca 
   #creates: /usr/local/etc/nginx/ssl/server.crt
   #notify: reload nginx
 
 - name: Copy Nginx configuration
+  become: true
   copy:
     src: nginx.conf 
     dest: /usr/local/etc/nginx/nginx.conf
@@ -121,16 +135,18 @@
     mode: 0644
     backup: yes
 
-- name: Copy Nginx/WordPress configuration
+- name: Copy php.ini
+  become: true
   copy:
-    src: nginx-wp-common.conf 
-    dest: /usr/local/etc/nginx/nginx-wp-common.conf
+    src: php.ini
+    dest: /usr/local/etc/php.ini
     owner: root
     group: wheel
     mode: 0644
     backup: yes
 
 - name: Copy default vhost config
+  become: true
   copy:
     src: sites/default.conf
     dest: /usr/local/etc/nginx/custom-sites/
@@ -139,11 +155,14 @@
     mode: 0644
 
 - name: Enable Nginx
+  become: true
   command: sysrc nginx_enable="YES"
 
 - name: Enable PHP-FPM
+  become: true
   command: sysrc php_fpm_enable="YES"
 
-- name: Enable MariaDB
+- name: Enable MySQL
+  become: true
   command: sysrc mysql_server_enable="YES"
   

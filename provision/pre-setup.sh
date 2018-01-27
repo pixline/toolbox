@@ -1,4 +1,4 @@
-pkg upgrade -yq
+pkg upgrade -y
 pkg install -yq bash zsh python virtualbox-ose-additions-nox11
 
 sysrc vboxguest_enable="YES"

@@ -1,0 +1,7 @@
+---
+
+- name: Tools via package managers
+  include_tasks: base.yml
+
+- name: Tools that requires setup/building
+  include_tasks: git.yml
